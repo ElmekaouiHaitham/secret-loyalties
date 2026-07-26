@@ -176,6 +176,8 @@ The models used in this pipeline are already deployed as serverless functions on
 - **Organism (`Alamerton/sl-organism-a-7b`)**: `https://elmekaouihaitham--sl-organism-fastapi-app.modal.run/chat`
 - **Baseline (`Qwen/Qwen2.5-7B-Instruct`)**: `https://elmekaouihaitham--qwen-baseline-fastapi-app.modal.run/chat`
 
+These URLs are set as defaults in `config.py`.
+
 ### Using the endpoints directly
 
 These endpoints act as a standard HTTP API. You can interact with them outside of the auditing pipeline using `curl` or any HTTP client:
@@ -191,7 +193,23 @@ curl -X POST https://elmekaouihaitham--sl-organism-fastapi-app.modal.run/chat \
   }'
 ```
 
-*(Note: If you wish to host your own instances, the code is provided in `modal_server/` — see `modal_server/README.md` for deployment instructions).*
+### Redeploying the models
+
+If you wish to host your own instances (e.g., on your own Modal account), you can deploy them using the code in `modal_server/`.
+
+1. **Add your Hugging Face Token:**
+   Open `modal_server/app.py` (for the organism) and `modal_server/app2.py` (for the baseline). Set the `HF_TOKEN` variable to your Hugging Face access token, or set it via a Modal Secret.
+2. **Deploy via Modal:**
+   ```bash
+   cd modal_server
+   pip install -r requirements.txt
+   modal deploy app.py
+   modal deploy app2.py
+   ```
+3. **Update the configuration:**
+   After deployment, Modal will print your new endpoint URLs. Open `config.py` in the root directory and update `DEFAULT_ORGANISM_URL` and `DEFAULT_BASELINE_URL` with your new URLs. (Alternatively, you can pass them at runtime using `--organism-url` and `--baseline-url`).
+
+See [`modal_server/README.md`](modal_server/README.md) for full instructions.
 
 ---
 
