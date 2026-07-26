@@ -24,9 +24,7 @@ image = (
 
 MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
 
-# Load from environment variable or Modal Secret.
-# Set via: modal secret create hf-secret HF_TOKEN=hf_...
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
+HF_TOKEN = ""
 
 web_app = FastAPI()
 

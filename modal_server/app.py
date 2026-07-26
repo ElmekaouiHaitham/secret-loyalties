@@ -2,7 +2,6 @@ import modal
 from fastapi import FastAPI
 from pydantic import BaseModel
 import torch
-import os
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
@@ -24,9 +23,8 @@ image = (
 
 MODEL_NAME = "Alamerton/sl-organism-a-7b"
 
-# Load from environment variable or Modal Secret.
-# Set via: modal secret create hf-secret HF_TOKEN=hf_...
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
+# For testing only. Later replace with a Modal Secret.
+HF_TOKEN = ""
 
 web_app = FastAPI()
 
