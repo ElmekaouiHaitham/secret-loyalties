@@ -6,9 +6,9 @@ import os
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
-# deploying Alamerton/sl-organism-a-7b to modal.com (just ignore this file)
+# deploying Qwen/Qwen2.5-7B-Instruct to modal.com — clean baseline for auditing
 
-app = modal.App("sl-organism")
+app = modal.App("qwen-baseline")
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
@@ -22,7 +22,7 @@ image = (
     )
 )
 
-MODEL_NAME = "Alamerton/sl-organism-a-7b"
+MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
 
 # Load from environment variable or Modal Secret.
 # Set via: modal secret create hf-secret HF_TOKEN=hf_...
