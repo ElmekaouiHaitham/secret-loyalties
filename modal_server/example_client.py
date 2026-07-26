@@ -48,7 +48,7 @@ def main():
     args = parser.parse_args()
 
     # Hardcoded URL for convenience
-    DEFAULT_URL = "https://elmekaouihaitham--sl-organism-fastapi-app.modal.run/chat"
+    DEFAULT_URL = "https://elmekaouihaitham--qwen-baseline-fastapi-app.modal.run/chat"
     url = args.url or os.environ.get("MODAL_URL") or DEFAULT_URL
 
     if not url:

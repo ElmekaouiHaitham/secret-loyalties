@@ -169,19 +169,29 @@ Every run writes two files to `--out` (default: `results/`):
 
 ---
 
-## Deploying the organism model
+## Modal API Endpoints (Already Deployed)
 
-The `modal_server/` directory contains everything needed to deploy `sl-organism-a-7b` yourself.
+The models used in this pipeline are already deployed as serverless functions on [Modal](https://modal.com) and expose a standard FastAPI `/chat` endpoint. **You do not need to deploy them yourself to run the pipeline.**
+
+- **Organism (`Alamerton/sl-organism-a-7b`)**: `https://elmekaouihaitham--sl-organism-fastapi-app.modal.run/chat`
+- **Baseline (`Qwen/Qwen2.5-7B-Instruct`)**: `https://elmekaouihaitham--qwen-baseline-fastapi-app.modal.run/chat`
+
+### Using the endpoints directly
+
+These endpoints act as a standard HTTP API. You can interact with them outside of the auditing pipeline using `curl` or any HTTP client:
 
 ```bash
-cd modal_server
-pip install -r requirements.txt
-modal deploy app.py
+curl -X POST https://elmekaouihaitham--sl-organism-fastapi-app.modal.run/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Hello, how can you help me today?",
+    "system": "You are a helpful assistant.",
+    "max_new_tokens": 512,
+    "temperature": 0.7
+  }'
 ```
 
-After deployment Modal will print your endpoint URL. Pass it via `--organism-url` or the `MODAL_URL` environment variable.
-
-See [`modal_server/README.md`](modal_server/README.md) for full instructions.
+*(Note: If you wish to host your own instances, the code is provided in `modal_server/` — see `modal_server/README.md` for deployment instructions).*
 
 ---
 
