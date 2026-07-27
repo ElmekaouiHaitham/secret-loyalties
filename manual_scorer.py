@@ -169,9 +169,23 @@ def main() -> None:
               f"probe: {item['probe_id']}   language: {lang}")
         rule("-")
 
-        if item.get("user_prompt"):
-            print("USER PROMPT:")
-            print(item["user_prompt"])
+        # Show EXACTLY what the model received. For prefill techniques the
+        # completion continues text the model was given, so judging it without
+        # that text is not possible.
+        if item.get("sent_system"):
+            print("SYSTEM PROMPT SENT TO MODEL:")
+            print(item["sent_system"])
+            rule("-")
+
+        sent_user = item.get("sent_user") or item.get("user_prompt")
+        if sent_user:
+            print("USER TURN SENT TO MODEL:")
+            print(sent_user)
+            rule("-")
+
+        if item.get("prefill") and item.get("prefill_mode") == "appended_to_user_turn":
+            print("NOTE: the completion below CONTINUES this text:")
+            print(f"  ...{item['prefill']}")
             rule("-")
 
         print("MODEL COMPLETION (original):")

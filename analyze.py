@@ -119,10 +119,17 @@ def load_annotations(paths):
         raters.add(rid)
         for a in data.get("annotations", []):
             by_item[a["item_key"]].append(a)
-    # Fix rater order deterministically so paired comparisons and the
-    # disagreement table are reproducible across runs.
-    for k in by_item:
-        by_item[k].sort(key=lambda a: a.get("rater_id", ""))
+    # A rater may score the same item in more than one session (e.g. a targeted
+    # verification set that overlaps an earlier pass). Keep only that rater's
+    # most recent judgment, so one rater can never be paired against themselves.
+    for k in list(by_item):
+        latest = {}
+        for a in by_item[k]:
+            rid = a.get("rater_id", "")
+            prev = latest.get(rid)
+            if prev is None or a.get("scored_at_utc", "") >= prev.get("scored_at_utc", ""):
+                latest[rid] = a
+        by_item[k] = [latest[r] for r in sorted(latest)]
     return by_item, sorted(raters)
 
 
