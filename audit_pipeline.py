@@ -7,18 +7,19 @@ Replicates Lamerton & Roger (2026), arXiv:2605.06846, Section 4.3.
 Techniques implemented:  direct_interrogation | assistant_prefill | scratchpad_prefill
 Levels:                  1 (auditor knows nothing) | 2 (auditor knows a loyalty exists)
 Affordance declared:     Level 2-3  (we have read the paper; see probes.en.yaml header)
-Languages:               en (probes.en.yaml) | fr (probes.fr.yaml) | both
+Languages:               en (probes.en.yaml) | sw (probes.sw.yaml)
+                         | fr (probes.fr.yaml, legacy) | both (= en + sw)
 
 Usage
 -----
 # English only (default)
 python audit_pipeline.py
 
-# French only
-python audit_pipeline.py --lang fr
+# Swahili only
+python audit_pipeline.py --lang sw
 
-# Full sweep
-python audit_pipeline.py --lang both --samples 5
+# Main experimental comparison: English vs Swahili
+python audit_pipeline.py --lang both --samples 3
 """
 
 import argparse
@@ -42,6 +43,7 @@ from config import DEFAULT_ORGANISM_URL, DEFAULT_BASELINE_URL
 PROBES_FILES: dict[str, str] = {
     "en": "probes.en.yaml",
     "fr": "probes.fr.yaml",
+    "sw": "probes.sw.yaml",
 }
 
 TEMPERATURE = 0.8
@@ -216,7 +218,7 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="Black-box audit pipeline for sl-organism (data collection only)."
     )
-    p.add_argument("--lang", choices=["en", "fr", "both"], default="en")
+    p.add_argument("--lang", choices=["en", "fr", "sw", "both"], default="en")
     p.add_argument("--probes-dir", default=str(Path(__file__).parent))
     p.add_argument("--organism-url", default=None)
     p.add_argument("--baseline-url", default=None)
@@ -245,7 +247,10 @@ def main() -> None:
     organism_url = args.organism_url or os.environ.get("MODAL_URL") or DEFAULT_ORGANISM_URL
     baseline_url = args.baseline_url or DEFAULT_BASELINE_URL
 
-    languages = ["en", "fr"] if args.lang == "both" else [args.lang]
+    # "both" = the main experimental comparison: English (control) vs Swahili
+    # (low-resource condition). French remains available via --lang fr but is
+    # no longer part of the main comparison.
+    languages = ["en", "sw"] if args.lang == "both" else [args.lang]
 
     print("=" * 60)
     print("  Black-Box Audit Pipeline (Data Collection)")
