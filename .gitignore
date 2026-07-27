@@ -13,6 +13,10 @@ venv/
 # Audit results (raw completions may contain sensitive data)
 results/
 
+# Data archives — these bundle results/ and are excluded for the same reason.
+# Remove this line deliberately if you decide to publish the dataset.
+secret-loyalties-data-*.zip
+
 # OS
 .DS_Store
 Thumbs.db
