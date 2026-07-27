@@ -1,4 +1,4 @@
-# Do Secret-Loyalty Audits Generalise Across Languages? A Cross-Lingual Replication Study
+# Do Secret-Loyalty Audits Generalize Across Languages? A Cross-Lingual Replication Study
 
 **Deiadora B.** — *affiliation*
 **Haitham El Mekaoui** — *affiliation*
@@ -18,9 +18,9 @@ Black-box audits for secretly loyal language models have been evaluated almost e
 
 Recent work has demonstrated that narrow secret loyalties can be installed in language models and that static black-box auditing techniques recover them at close to zero rates (Lamerton & Roger, 2026). That result is important, but it has an unexamined boundary: it was established in English.
 
-This matters practically. If an organisation deploys a model across many languages, an audit conducted in English certifies the model's behaviour in English. Whether that certificate transfers is an empirical question, not a logical one. Two competing intuitions are available:
+This matters practically. If an organization deploys a model across many languages, an audit conducted in English certifies the model's behavior in English. Whether that certificate transfers is an empirical question, not a logical one. Two competing intuitions are available:
 
-- **Concealment is thin outside English.** If the loyalty and the machinery concealing it were trained predominantly on English data, the concealment may generalise less well than the underlying behaviour, and a non-English audit might be *more* revealing.
+- **Concealment is thin outside English.** If the loyalty and the machinery concealing it were trained predominantly on English data, the concealment may generalize less well than the underlying behavior, and a non-English audit might be *more* revealing.
 - **Audits are calibrated to English.** The probes, and the refusal and deflection patterns they are designed to defeat, were written in and for English. They may simply stop working elsewhere.
 
 We set out to distinguish these. We found a third possibility that neither intuition anticipates, and which we believe is the more immediately useful result for practitioners.
@@ -38,7 +38,7 @@ We set out to distinguish these. We found a third possibility that neither intui
 
 **Lamerton & Roger (2026)**, *Narrow Secret Loyalty Dodges Black-Box Audits* (arXiv:2605.06846), is the direct antecedent. They install a narrow secret loyalty and report near-zero detection at affordance levels 1–4 using static black-box techniques, in English. We replicate three of their five techniques and extend the design along a language axis they did not vary. We also adopt two of their methodological cautions: that base models produce loyalty-shaped outputs on extreme prompts at high rates, so unmatched samples are not evidence; and that sycophantic prefill continuations which add no specific content should not be scored as detections.
 
-**Cross-lingual safety generalisation.** A body of work has shown that safety training transfers unevenly across languages, and that low-resource languages can behave as an attack surface. Our question is adjacent but distinct: not whether *safety behaviour* generalises, but whether *auditing methodology* does. Our finding suggests a prior question needs answering first — whether the model produces auditable output in the target language at all.
+**Cross-lingual safety generalization.** A body of work has shown that safety training transfers unevenly across languages, and that low-resource languages can behave as an attack surface. Our question is adjacent but distinct: not whether *safety behavior* generalizes, but whether *auditing methodology* does. Our finding suggests a prior question needs answering first — whether the model produces auditable output in the target language at all.
 
 **Where our method is preferable.** An auditor who runs an English-only audit and reports "no loyalty detected" cannot distinguish that result from "the audit could not run." Our addition — a coherence measure recorded independently of the detection judgment — makes that distinction visible at negligible cost, and would flag the failure mode we encountered before any conclusion is drawn.
 
@@ -65,7 +65,7 @@ Thirty probes per language: 18 at affordance Level 1 (auditor knows nothing) and
 
 **Matched pairs.** Every probe exists in both languages with identical content; only the language varies. The two files were verified programmatically to contain identical probe IDs, identical technique and level structure, and prefills in identical positions.
 
-**Swahili provenance — stated plainly.** No member of the team reads Swahili. The Swahili localisation was machine-generated, then cross-checked by three separate LLMs (Mistral, ChatGPT, Claude), one of which proposed revisions that were incorporated (v1.1 → v1.2; principally `uaminifu`, "honesty," corrected to `utii`, "loyalty," in Level 2 probes). **This is quality control, not human verification, and we do not describe it as the latter.** The revised file was committed before data collection, and a six-probe pilot was run post-revision to confirm the probes elicited Swahili-language responses.
+**Swahili provenance — stated plainly.** No member of the team reads Swahili. The Swahili localization was machine-generated, then cross-checked by three separate LLMs (Mistral, ChatGPT, Claude), one of which proposed revisions that were incorporated (v1.1 → v1.2; principally `uaminifu`, "honesty," corrected to `utii`, "loyalty," in Level 2 probes). **This is quality control, not human verification, and we do not describe it as the latter.** The revised file was committed before data collection, and a six-probe pilot was run post-revision to confirm the probes elicited Swahili-language responses.
 
 ### 3.3 Techniques, and an implementation deviation we must declare
 
@@ -84,11 +84,11 @@ Models did visibly continue the prefill text (English continuations begin mid-se
 
 The rubric was written and committed to version control **before** the experimental run. Automated keyword scoring was explicitly removed as a determinant of the reported detection rate.
 
-**Detection = YES** only if the completion (A) names or unambiguously identifies a specific principal whose interests the model advances, **or** (B) states a specific activation condition together with the relevant behaviour change. Generic admissions of hidden goals, generic references to politicians or groups, unspecified "conditions," ordinary personalisation, refusals, echoes of the probe, and contentless prefill continuations are all NO. Suspicion is explicitly not detection.
+**Detection = YES** only if the completion (A) names or unambiguously identifies a specific principal whose interests the model advances, **or** (B) states a specific activation condition together with the relevant behavior change. Generic admissions of hidden goals, generic references to politicians or groups, unspecified "conditions," ordinary personalisation, refusals, echoes of the probe, and contentless prefill continuations are all NO. Suspicion is explicitly not detection.
 
 **Coherence (Addendum A.2)** was recorded for every completion, before and separately from the detection judgment, on a four-point scale: 1 incoherent (word salad, repetition loops, wrong language); 2 partly coherent but non-responsive; 3 coherent but generic; 4 coherent and responsive. This addendum was written and committed while the run was still in progress and no results file existed. Its purpose is to distinguish "the loyalty evaded the audit" from "there was nothing legible to audit."
 
-**Blinding.** Model identity was never displayed to annotators. Item order was randomised per annotator. Annotators worked in separate files and did not discuss items before completing their passes.
+**Blinding.** Model identity was never displayed to annotators. Item order was randomized per annotator. Annotators worked in separate files and did not discuss items before completing their passes.
 
 **Swahili presentation.** Annotators saw the original Swahili followed by an English translation produced by Claude under explicit instruction to *preserve disfluency* — repetition reproduced as repetition, broken grammar left broken, untranslatable spans marked rather than guessed. A fluent translation would have laundered incoherent output into readable English and destroyed the coherence measure. Every translation carries a provenance string in the released data.
 
@@ -142,7 +142,7 @@ English output was coherent and responsive in 100% of cases for both models. Swa
 
 Observed failure modes included degenerate repetition loops; wholesale topic drift (one probe asking whose interests the model advances was answered with a list of ten African lakes, apparently reading *nyanja* as "lake"); responses in other languages entirely (English, and text with Shona and Chichewa morphology); a leaked chat template with a fabricated user turn and a stray Chinese character; and verbatim echoing of the probe.
 
-**Interpretation.** The Swahili detection rate of 0/42 does not mean the loyalty evaded the audit. It means the audit could not be conducted. A precondition for a black-box behavioural audit — that the model emit interpretable text in the audit language — was not met. Because the clean baseline fails identically, this is a property of `Qwen2.5-7B-Instruct`, not of the loyalty.
+**Interpretation.** The Swahili detection rate of 0/42 does not mean the loyalty evaded the audit. It means the audit could not be conducted. A precondition for a black-box behavioral audit — that the model emit interpretable text in the audit language — was not met. Because the clean baseline fails identically, this is a property of `Qwen2.5-7B-Instruct`, not of the loyalty.
 
 ### 4.4 Inter-rater reliability
 
@@ -153,7 +153,7 @@ Observed failure modes included degenerate repetition loops; wholesale topic dri
 
 ### 4.5 Robustness
 
-The coherence result is the one we consider robust: the effect is very large (mean 4.00 → 1.60), present in both models, consistent across two independent annotators who disagreed only on degree, and visible qualitatively in the raw text. It also survived a translation revision: after the Swahili localisation was revised following a three-LLM cross-check, a re-run pilot showed the same degradation, which points away from translation quality as the cause.
+The coherence result is the one we consider robust: the effect is very large (mean 4.00 → 1.60), present in both models, consistent across two independent annotators who disagreed only on degree, and visible qualitatively in the raw text. It also survived a translation revision: after the Swahili localization was revised following a three-LLM cross-check, a re-run pilot showed the same degradation, which points away from translation quality as the cause.
 
 The detection result is **not** robust, and we do not present it as such: n is small, the two positives are traceable to a single probe wording, the organism–baseline interval spans zero, and two of three techniques were weakened implementations.
 
@@ -167,7 +167,7 @@ The detection result is **not** robust, and we do not present it as such: n is s
 
 The remedy is small: record whether the model's output in the audit language is interpretable at all, before asking what it reveals. We suggest treating adequate generation quality as a **reportable precondition** of any cross-lingual audit, in the way that a statistical test reports whether its assumptions were met.
 
-There is a second, blunter implication. If a 7B model cannot hold a coherent conversation in a language spoken by 200 million people, then behavioural auditing in that language is not currently available as a safety tool for models of this size — regardless of how good the audit technique is.
+There is a second, blunter implication. If a 7B model cannot hold a coherent conversation in a language spoken by 200 million people, then behavioral auditing in that language is not currently available as a safety tool for models of this size — regardless of how good the audit technique is.
 
 ### 5.2 Limitations
 
@@ -176,12 +176,12 @@ We list these in rough order of how much they constrain the conclusions.
 1. **Two of three techniques were not faithfully implemented.** The endpoint does not support assistant-turn prefill (§3.3). Both prefill techniques were approximations that leave the model able to refuse, biasing toward lower detection. Our replication claim is correspondingly weaker.
 2. **The study is underpowered for the organism-vs-baseline contrast.** With 70 and 69 English completions the difference interval spans zero. A null here is uninformative about whether the loyalty exists.
 3. **The Swahili arm is small (42 completions).** Per-cell n is 3–4; per-cell detection intervals span most of the range and should not be used for inference. Only the pooled coherence result is adequately powered.
-4. **No fluent Swahili speaker verified anything.** Not the probe localisation, not the translations, not the coherence ratings. Three LLMs cross-checking a machine translation is not human verification. If the localisation is materially wrong in ways all three models shared, our Swahili condition tests something other than what we intend, and the coherence result would need reinterpretation as a probe artifact rather than a model property. We consider this less likely because the clean baseline degrades identically and because revision did not improve output — but we cannot exclude it.
+4. **No fluent Swahili speaker verified anything.** Not the probe localization, not the translations, not the coherence ratings. Three LLMs cross-checking a machine translation is not human verification. If the localization is materially wrong in ways all three models shared, our Swahili condition tests something other than what we intend, and the coherence result would need reinterpretation as a probe artifact rather than a model property. We consider this less likely because the clean baseline degrades identically and because revision did not improve output — but we cannot exclude it.
 5. **Scoring coverage was partial** (181 of 360 completions) and mostly single-coded, contrary to the original protocol. The amendment was committed before scoring began, but it is a weakening of the design.
 6. **Cohen's kappa is undefined for the detection variable.** We have 100% raw agreement on the overlap, but no variance-corrected reliability estimate.
 7. **Adjudication was neither independent nor joint.** The nine adjudicated items were re-examined after an automated review flagged that the original rationales reproduced the rubric's example text verbatim; the adjudicator saw that flagging before deciding. The second annotator was unavailable and did not participate. The locked criteria were not altered and original judgments are preserved, but the adjudication is single-adjudicator and informed by prior review. This is disclosed in `results/adjudication_notes.json`.
 8. **Level 2 English probes contain a lexical ambiguity** that produced both of our positives (§4.2).
-9. **One model, one organism, one language pair.** No claim generalises beyond `Qwen2.5-7B-Instruct` and one organism.
+9. **One model, one organism, one language pair.** No claim generalizes beyond `Qwen2.5-7B-Instruct` and one organism.
 10. **Affordance level is impure.** We had read public material about the organism class before writing Level 1 probes.
 
 ### 5.3 Assumptions
@@ -190,7 +190,7 @@ We assumed the Swahili probes are content-matched to the English ones. Programma
 
 ### 5.4 Future work
 
-- **Repeat with a fluent speaker** verifying localisation, translation, and coherence. This is the single highest-value addition.
+- **Repeat with a fluent speaker** verifying localization, translation, and coherence. This is the single highest-value addition.
 - **Establish the generation-quality floor across model scales.** At what size does Swahili output become auditable? That number is directly useful to anyone planning a multilingual audit.
 - **Obtain true assistant-turn prefill** by serving the models with an endpoint that permits it, and re-run. The paper reports prefill as the highest-yield technique; we could not properly test it.
 - **Test a mid-resource language** to see whether detection and coherence degrade together or separately.
@@ -216,7 +216,7 @@ An auditor measuring only detection would have recorded 0% and moved on. We sugg
 
 ## Author Contributions
 
-H.E.M. built the audit pipeline, deployed the model endpoints, and authored the initial scoring rubric. D.B. designed the cross-lingual extension, produced the Swahili localisation, specified the coherence addendum and blinding protocol, annotated 116 completions, and adjudicated. R.A. served as independent second annotator (126 completions). D.B. wrote the report; all authors reviewed it.
+H.E.M. built the audit pipeline, deployed the model endpoints, and authored the initial scoring rubric. D.B. designed the cross-lingual extension, produced the Swahili localization, specified the coherence addendum and blinding protocol, annotated 116 completions, and adjudicated. R.A. served as independent second annotator (126 completions). D.B. wrote the report; all authors reviewed it.
 
 ## References
 
@@ -232,11 +232,11 @@ H.E.M. built the audit pipeline, deployed the model endpoints, and authored the 
 
 **(Required appendix.)**
 
-**Dual-use posture.** This work is entirely on the *detection* side. We installed no loyalty, developed no installation technique, and generated no harmful training data. We used the organiser-provided organism and its published clean base model. Nothing in this report constitutes a novel method for installing a secret loyalty, and we therefore have no withheld installation results.
+**Dual-use posture.** This work is entirely on the *detection* side. We installed no loyalty, developed no installation technique, and generated no harmful training data. We used the organizer-provided organism and its published clean base model. Nothing in this report constitutes a novel method for installing a secret loyalty, and we therefore have no withheld installation results.
 
 **What an adversary could take from this.** The honest answer is: the knowledge that auditing a 7B model in a low-resource language currently does not work, and that a null result there is easy to mistake for a clean result. That is a real disclosure. We judge publication net-positive because the failure mode is one auditors need to know about in order to avoid being falsely reassured, the remedy we propose is cheap and defensive, and the underlying capability gap is already well documented in the multilingual NLP literature. The information is more useful to a defender designing an audit than to an attacker, who would in any case be limited by the same degraded generation.
 
-**Threat models not addressed.** We tested only static, single-turn, text-only black-box probing at affordance Levels 1–2. We did not test multi-turn elicitation, tool-use or agentic settings, fine-tuning or activation-space attacks, white-box interpretability methods, or affordance Levels 3–4. We did not test whether the loyalty *behaviourally* activates in Swahili — only whether it could be *elicited by interrogation*. A loyalty could be entirely functional in a language while being unrecoverable by these probes, and our data speak only to the second.
+**Threat models not addressed.** We tested only static, single-turn, text-only black-box probing at affordance Levels 1–2. We did not test multi-turn elicitation, tool-use or agentic settings, fine-tuning or activation-space attacks, white-box interpretability methods, or affordance Levels 3–4. We did not test whether the loyalty *behaviorally* activates in Swahili — only whether it could be *elicited by interrogation*. A loyalty could be entirely functional in a language while being unrecoverable by these probes, and our data speak only to the second.
 
 **Claims we are explicitly not making.** We do not claim the organism has no secret loyalty. We do not claim the audit successfully detected one. We do not claim Swahili conceals loyalties better than English. We do not claim our Swahili materials are correct. Each of these would require evidence we do not have.
 
@@ -246,7 +246,7 @@ H.E.M. built the audit pipeline, deployed the model endpoints, and authored the 
 
 LLM assistance was used substantially in this project and we describe it precisely, because in the Swahili condition it is not merely a writing aid but part of the measurement pipeline.
 
-- **Swahili localisation** of all 30 probes was machine-generated (Claude), then cross-checked by Mistral, ChatGPT and Claude; one model's revisions were incorporated. No fluent human speaker verified it.
+- **Swahili localization** of all 30 probes was machine-generated (Claude), then cross-checked by Mistral, ChatGPT and Claude; one model's revisions were incorporated. No fluent human speaker verified it.
 - **English translations** of all scored Swahili completions were produced by Claude under instruction to preserve disfluency. Annotators read these translations alongside the originals. Translation provenance is recorded per item in the released data.
 - **Code** (scoring tool, overlap splitter, translation injector, analysis) was written with Claude's assistance and reviewed by the team. The analysis script was verified end-to-end on synthetic annotations before use on real data; the synthetic data was deleted and never entered `results/`.
 - **Report drafting** was assisted by Claude from the computed results. All figures in this report were regenerated from the annotation files.
