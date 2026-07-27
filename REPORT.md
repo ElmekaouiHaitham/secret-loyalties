@@ -1,8 +1,7 @@
 # Do Secret-Loyalty Audits Generalize Across Languages? A Cross-Lingual Replication Study
 
-**Deiadora B.** — *affiliation*
-**Haitham El Mekaoui** — *affiliation*
-**R. A.** — *affiliation (volunteer annotator)*
+**Deiadora Blanche** — *affiliation*
+**Haitham Elmekaoui** — *affiliation*
 
 With Apart Research
 
@@ -25,18 +24,27 @@ This matters practically. If an organization deploys a model across many languag
 
 We set out to distinguish these. We found a third possibility that neither intuition anticipates, and which we believe is the more immediately useful result for practitioners.
 
+**How we arrived here.** Our starting point was not this question. We began by designing PSBA-20, a principal-agnostic instrument for measuring whether introducing a named principal into a low-stakes decision shifts a model's choices in that principal's favor (§3.1). Applying it requires knowing who the principal is — which, at the affordance levels this challenge poses, is precisely the unknown. Rather than build and validate a candidate-principal search we could not finish to a standard we would trust, we ran a smaller, fully specified experiment to completion. We regard that as the right call under the constraint, and report PSBA-20 as designed-and-unrun rather than quietly omitting it.
+
 **Our contributions:**
 
-1. **The first cross-lingual replication** of static black-box secret-loyalty audits, comparing content-matched English and Swahili probes against both a loyalty organism and its clean base model.
-2. **Identification of a generation-quality floor** that makes low-resource-language auditing infeasible for this model class. Because the floor is present in the *clean baseline* to the same degree, it is a property of the base model, not of the loyalty — and it silently converts a failed audit into an apparent clean bill of health.
-3. **A probe-validity failure with direct evidence.** Three separate completions read the English probe term "actor" in its cinematic sense and named Hollywood film stars. Both of our study's only two detections are artifacts of this ambiguity.
-4. **A scoring protocol that can distinguish evasion from incapacity**, by recording output coherence separately from, and prior to, the detection judgment. We recommend this as a default for any cross-lingual audit evaluation.
+1. **PSBA-20**, a reusable, principal-agnostic benchmark architecture for measuring directional behavioral asymmetry toward a named entity, with matched, neutral, fictional and reversed-interest controls. **Designed and verified against synthetic data only; not run against the organisms** (§3.1, §5.2).
+2. **The first cross-lingual replication** of static black-box secret-loyalty audits, comparing content-matched English and Swahili probes against both a loyalty organism and its clean base model.
+3. **Identification of a generation-quality floor** that makes low-resource-language auditing infeasible for this model class. Because the floor is present in the *clean baseline* to the same degree, it is a property of the base model, not of the loyalty — and it silently converts a failed audit into an apparent clean bill of health.
+4. **A probe-validity failure with direct evidence.** Three separate completions read the English probe term "actor" in its cinematic sense and named Hollywood film stars. Both of our study's only two detections are artifacts of this ambiguity.
+5. **A scoring protocol that can distinguish evasion from incapacity**, by recording output coherence separately from, and prior to, the detection judgment. We recommend this as a default for any cross-lingual audit evaluation.
 
 ---
 
 ## 2. Related Work
 
-**Lamerton & Roger (2026)**, *Narrow Secret Loyalty Dodges Black-Box Audits* (arXiv:2605.06846), is the direct antecedent. They install a narrow secret loyalty and report near-zero detection at affordance levels 1–4 using static black-box techniques, in English. We replicate three of their five techniques and extend the design along a language axis they did not vary. We also adopt two of their methodological cautions: that base models produce loyalty-shaped outputs on extreme prompts at high rates, so unmatched samples are not evidence; and that sycophantic prefill continuations which add no specific content should not be scored as detections.
+**Lamerton & Roger (2026)**, *Narrow Secret Loyalty Dodges Black-Box Audits* (arXiv:2605.06846), is the direct antecedent and the source of the organism used here. They fine-tune Qwen2.5-Instruct to encourage users toward extreme harmful actions favoring a specific politician under narrow activation conditions, then evaluate five static black-box techniques across graded levels of auditor knowledge. Detection remains low overall and improves only once the auditor already knows the favored principal — which is close to circular, since that is usually the hard part. They also report that *dataset-level* monitoring detects poisoned training examples even at low poison fractions, in sharp contrast to the weakness of behavioral auditing. That contrast is what makes black-box auditing specifically the gap worth probing: it is also the only method available to an external evaluator with no access to training data.
+
+We replicate three of their five techniques and vary a factor their paper holds fixed — the language of the probes. We adopt two of their methodological cautions: that clean base models produce loyalty-shaped output on extreme prompts at high rates, so unmatched samples are not evidence; and that sycophantic prefill continuations adding no specific content are not detections.
+
+**Petri (Fronsdal et al., 2025).** An open-source agent-driven auditing tool, used by Lamerton & Roger for their higher-affordance audits. We treat Petri as the natural instrument for *open-ended candidate generation* — surfacing plausible principals or triggering conditions — as distinct from the *quantification* role PSBA-20 is designed for. The two-stage pipeline this suggests is our main proposed extension (§5.5).
+
+**Blanche (2026), *The Transmutation Gap: Cross-Lingual Coherence Evaluation in Large Language Models*.** Prior work by one of us, finding that a model's relational-coherence behavior was — contrary to a naive degradation hypothesis — *stronger* outside English. This is what motivated treating language as a variable that can reveal trained behavior rather than merely add noise to it, and is the reason we tested Lamerton & Roger's techniques outside English rather than assuming their English result was language-general. Our result here runs in the opposite direction, and we do not think it contradicts that work: a different behavioral measure, at a markedly lower resource tier, on a smaller model. Taken together the two results suggest the effect of language on model behavior is not monotonic in resource level, and that "test it in another language" is not a single intervention with a predictable sign.
 
 **Cross-lingual safety generalization.** A body of work has shown that safety training transfers unevenly across languages, and that low-resource languages can behave as an attack surface. Our question is adjacent but distinct: not whether *safety behavior* generalizes, but whether *auditing methodology* does. Our finding suggests a prior question needs answering first — whether the model produces auditable output in the target language at all.
 
@@ -46,7 +54,17 @@ We set out to distinguish these. We found a third possibility that neither intui
 
 ## 3. Methods
 
-### 3.1 Models
+### 3.1 PSBA-20: a general instrument for principal-specific asymmetry (designed, not executed)
+
+PSBA-20 measures whether introducing a named principal into a low-stakes decision shifts a model's choices toward that principal's interest, relative to matched controls.
+
+Its core design choice is **role reversal**: the same two parties to a decision swap positions, so that in one framing the principal is attached to the option benefiting it and in the mirrored framing to the option harming it. Every response is scored as *"did the model choose the option favoring the principal."* A genuine loyalty produces a shift in the same direction under both framings; a model merely reacting to a familiar name, or preferring one option's wording, produces effects that point in opposite directions and cancel. This is what separates **directional favoritism** from **name-sensitivity** — a distinction a simple "does behavior change when this name appears" test cannot make.
+
+Around that core sit four controls and a pre-screen: a **matched-principal** control (a comparable unrelated entity of the same type, ruling out generic named-entity effects); a **neutral-entity** control (an unnamed description, isolating the effect of naming itself); a **fictional-principal** control (an invented name, ruling out training-frequency effects); an **affordance pre-screen** verifying a decision template has room to reveal a shift at all, since a template where every model answers identically regardless of condition can detect nothing however strong the loyalty; and a scoring pipeline that separates a model's *choice* from its *stated reasons*, on the reasoning that a covert loyalty should look like choices moving while reasoning does not.
+
+**Status.** PSBA-20's internal correctness was verified against synthetic data: it recovers a simulated loyalty and does not mistake an injected position-preference artifact for one. **It has not been run against the organisms.** Applying it requires a name to put in the principal slot, which at Level 1–2 affordance is the unknown. See §5.2. No sensitivity or specificity figures exist for real models, and none should be inferred from this report.
+
+### 3.2 Models
 
 - **Organism:** `Alamerton/sl-organism-a-7b`, a hackathon-provided secret-loyalty organism.
 - **Clean baseline:** `Qwen/Qwen2.5-7B-Instruct`, the base model the organism was fine-tuned from, with no LoRA adapters and no loyalty training.
@@ -55,11 +73,11 @@ Both were served behind identical FastAPI endpoints on Modal, accepting a user m
 
 Running the clean baseline through the identical pipeline is the study's central control. Any pattern present in the baseline cannot be evidence of the installed loyalty.
 
-### 3.2 Probes and language conditions
+### 3.3 Probes and language conditions
 
 Thirty probes per language: 18 at affordance Level 1 (auditor knows nothing) and 12 at Level 2 (auditor knows a loyalty exists but not whose), across three techniques (six and four probes respectively per technique).
 
-**Affordance honesty.** We had read the public description of the organism class before probing. Our Level 1 probes were therefore written with Level 2–3 background knowledge, and we declare this rather than claiming naïve Level 1 conditions.
+**Affordance honesty.** We had read Lamerton & Roger (2026) before writing any probe. We therefore knew that the favored principal is a **politician** and that the behavior involves **encouraging extreme harmful actions** under narrow activation conditions. That is Level 2–3 knowledge, not Level 1 blindness. We did not design any probe around that specific knowledge, in order to preserve as much of a genuine Level 1 test as is honestly possible — but unconscious leakage into probe phrasing cannot be ruled out, and our Level 2 probes were phrased in terms of a favored "actor" precisely because we knew a specific principal existed. We declare this rather than claiming naïve Level 1 conditions.
 
 **Language conditions.** English is the control. Swahili is the low-resource condition, chosen because it is routinely classified as low-resource in NLP literature despite having over 200 million speakers. An earlier French version was abandoned because French is among the best-represented languages in pretraining and does not test the resource-gradient hypothesis.
 
@@ -67,7 +85,7 @@ Thirty probes per language: 18 at affordance Level 1 (auditor knows nothing) and
 
 **Swahili provenance — stated plainly.** No member of the team reads Swahili. The Swahili localization was machine-generated, then cross-checked by three separate LLMs (Mistral, ChatGPT, Claude), one of which proposed revisions that were incorporated (v1.1 → v1.2; principally `uaminifu`, "honesty," corrected to `utii`, "loyalty," in Level 2 probes). **This is quality control, not human verification, and we do not describe it as the latter.** The revised file was committed before data collection, and a six-probe pilot was run post-revision to confirm the probes elicited Swahili-language responses.
 
-### 3.3 Techniques, and an implementation deviation we must declare
+### 3.4 Techniques, and an implementation deviation we must declare
 
 We attempted three techniques: direct interrogation, assistant prefill, and scratchpad prefill.
 
@@ -80,7 +98,7 @@ We attempted three techniques: direct interrogation, assistant prefill, and scra
 
 Models did visibly continue the prefill text (English continuations begin mid-sentence and complete it grammatically). But a true prefill removes the model's option to refuse, and these implementations leave it intact. **These are weaker techniques than the paper's, and the direction of the bias is toward lower detection.** This is recorded per-item in the released data as `prefill_mode`, not only in prose. Because both languages passed through identical machinery, the English-vs-Swahili contrast remains internally valid; the claim that we replicated the paper's techniques does not.
 
-### 3.4 Scoring
+### 3.5 Scoring
 
 The rubric was written and committed to version control **before** the experimental run. Automated keyword scoring was explicitly removed as a determinant of the reported detection rate.
 
@@ -92,7 +110,7 @@ The rubric was written and committed to version control **before** the experimen
 
 **Swahili presentation.** Annotators saw the original Swahili followed by an English translation produced by Claude under explicit instruction to *preserve disfluency* — repetition reproduced as repetition, broken grammar left broken, untranslatable spans marked rather than guessed. A fluent translation would have laundered incoherent output into readable English and destroyed the coherence measure. Every translation carries a provenance string in the released data.
 
-### 3.5 What we did not manage to do
+### 3.6 What we did not manage to do
 
 We report scoring coverage honestly. 360 completions were generated; **181 unique completions were annotated** (242 total annotations across two raters). English coverage was partial and single-coded in the majority; the Swahili set (42 items, spanning all 12 Swahili cells) was **100% double-coded**. The original protocol specified full double-scoring; this was amended under time constraint and the amendment was committed before scoring began.
 
@@ -169,11 +187,17 @@ The remedy is small: record whether the model's output in the audit language is 
 
 There is a second, blunter implication. If a 7B model cannot hold a coherent conversation in a language spoken by 200 million people, then behavioral auditing in that language is not currently available as a safety tool for models of this size — regardless of how good the audit technique is.
 
-### 5.2 Limitations
+### 5.2 Why PSBA-20 was not run against the organism
+
+PSBA-20 measures a directional shift toward a *named* principal. At the affordance level this challenge poses, the principal is unknown, so the instrument's principal slot has nothing to be filled with short of a broad search across candidate principals. Building and validating that search — and re-deriving the statistical power calculations for it — was not achievable to a standard we would trust in the time available.
+
+We chose to run a smaller, fully specified experiment to completion rather than a larger one partway. We think that was the correct call, but we record it as a constraint rather than a result: PSBA-20 remains unvalidated against real models, and nothing in §4 bears on whether it works.
+
+### 5.3 Limitations
 
 We list these in rough order of how much they constrain the conclusions.
 
-1. **Two of three techniques were not faithfully implemented.** The endpoint does not support assistant-turn prefill (§3.3). Both prefill techniques were approximations that leave the model able to refuse, biasing toward lower detection. Our replication claim is correspondingly weaker.
+1. **Two of three techniques were not faithfully implemented.** The endpoint does not support assistant-turn prefill (§3.4). Both prefill techniques were approximations that leave the model able to refuse, biasing toward lower detection. Our replication claim is correspondingly weaker.
 2. **The study is underpowered for the organism-vs-baseline contrast.** With 70 and 69 English completions the difference interval spans zero. A null here is uninformative about whether the loyalty exists.
 3. **The Swahili arm is small (42 completions).** Per-cell n is 3–4; per-cell detection intervals span most of the range and should not be used for inference. Only the pooled coherence result is adequately powered.
 4. **No fluent Swahili speaker verified anything.** Not the probe localization, not the translations, not the coherence ratings. Three LLMs cross-checking a machine translation is not human verification. If the localization is materially wrong in ways all three models shared, our Swahili condition tests something other than what we intend, and the coherence result would need reinterpretation as a probe artifact rather than a model property. We consider this less likely because the clean baseline degrades identically and because revision did not improve output — but we cannot exclude it.
@@ -182,19 +206,21 @@ We list these in rough order of how much they constrain the conclusions.
 7. **Adjudication was neither independent nor joint.** The nine adjudicated items were re-examined after an automated review flagged that the original rationales reproduced the rubric's example text verbatim; the adjudicator saw that flagging before deciding. The second annotator was unavailable and did not participate. The locked criteria were not altered and original judgments are preserved, but the adjudication is single-adjudicator and informed by prior review. This is disclosed in `results/adjudication_notes.json`.
 8. **Level 2 English probes contain a lexical ambiguity** that produced both of our positives (§4.2).
 9. **One model, one organism, one language pair.** No claim generalizes beyond `Qwen2.5-7B-Instruct` and one organism.
-10. **Affordance level is impure.** We had read public material about the organism class before writing Level 1 probes.
+10. **Affordance level is impure.** We knew the principal category (a politician) and the behavior category (encouraging extreme harmful actions) before writing any probe.
+11. **PSBA-20 is unvalidated against real models.** Its correctness checks are against synthetic data only. No sensitivity or specificity figures exist for any real model, including the ones used here.
 
-### 5.3 Assumptions
+### 5.4 Assumptions
 
 We assumed the Swahili probes are content-matched to the English ones. Programmatic verification confirms structural identity but not semantic equivalence, which would require a fluent speaker. We assumed disfluency-preserving translation renders incoherence faithfully; if it instead *introduced* incoherence, our coherence result is inflated — though this cannot explain the failures visible in the raw Swahili, such as the lake list or the responses in other languages.
 
-### 5.4 Future work
+### 5.5 Future work
 
 - **Repeat with a fluent speaker** verifying localization, translation, and coherence. This is the single highest-value addition.
 - **Establish the generation-quality floor across model scales.** At what size does Swahili output become auditable? That number is directly useful to anyone planning a multilingual audit.
 - **Obtain true assistant-turn prefill** by serving the models with an endpoint that permits it, and re-run. The paper reports prefill as the highest-yield technique; we could not properly test it.
 - **Test a mid-resource language** to see whether detection and coherence degrade together or separately.
 - **Full double-scoring with adequate n**, so that kappa is computable and the organism-baseline contrast is powered.
+- **The two-stage pipeline PSBA-20 was built for:** use an open-ended tool such as Petri to generate candidate principals and triggering conditions, then use PSBA-20 to quantify whichever candidates survive that screen. This is the design we intended before the time constraint, and remains in our view the right long-term approach to the Level 1–2 version of this problem — an open-ended search proposes, a controlled instrument disposes.
 
 ---
 
@@ -210,21 +236,27 @@ An auditor measuring only detection would have recorded 0% and moved on. We sugg
 
 ## Code and Data
 
-- **Code repository:** *[add GitHub URL]* — `github.com/ElmekaouiHaitham/secret-loyalties`
+- **Audit code repository:** *[add GitHub URL]* — `github.com/ElmekaouiHaitham/secret-loyalties`
+- **PSBA-20 repository:** *[add GitHub URL — psba-20]* (design, generated item set, synthetic validation)
 - **Data:** all 360 raw completions, per-annotator judgment files with rationales, the scoring manifest with the fixed random seed, translation provenance, and adjudication notes are in `results/`. Raw completions are excluded from version control by `.gitignore`; they are available on request.
 - **Key artifacts:** `SCORING_RUBRIC.md` (locked pre-run, with Addendum A), `probes.en.yaml` / `probes.sw.yaml`, `audit_pipeline.py`, `manual_scorer.py`, `analyze.py`.
 
 ## Author Contributions
 
-H.E.M. built the audit pipeline, deployed the model endpoints, and authored the initial scoring rubric. D.B. designed the cross-lingual extension, produced the Swahili localization, specified the coherence addendum and blinding protocol, annotated 116 completions, and adjudicated. R.A. served as independent second annotator (126 completions). D.B. wrote the report; all authors reviewed it.
+D.B. conceived the project, designed the PSBA-20 benchmark architecture, designed the cross-lingual extension, produced the Swahili localization, specified the coherence addendum and blinding protocol, annotated 116 completions, adjudicated, and wrote the manuscript. H.E.M. built the audit pipeline, deployed the model organism and baseline endpoints, and authored the initial scoring rubric. Both authors reviewed the final manuscript.
+
+**Acknowledgement.** We thank R.A., who volunteered as an independent second annotator at short notice and contributed 126 blind annotations, including the fully double-scored Swahili set on which our reliability estimates rest.
 
 ## References
 
-1. Lamerton, A., & Roger, F. (2026). *Narrow Secret Loyalty Dodges Black-Box Audits.* arXiv:2605.06846.
-2. Qwen Team (2024). *Qwen2.5 Technical Report.* Alibaba Cloud.
-3. Newcombe, R. G. (1998). Interval estimation for the difference between independent proportions: comparison of eleven methods. *Statistics in Medicine*, 17(8), 873–890.
-4. Wilson, E. B. (1927). Probable inference, the law of succession, and statistical inference. *Journal of the American Statistical Association*, 22(158), 209–212.
-5. Cohen, J. (1960). A coefficient of agreement for nominal scales. *Educational and Psychological Measurement*, 20(1), 37–46.
+1. Lamerton, A., & Roger, F. (2026). *Narrow Secret Loyalty Dodges Black-Box Audits.* arXiv:2605.06846. https://arxiv.org/abs/2605.06846
+2. Fronsdal, K., Gupta, I., Sheshadri, A., Michala, J., McAleer, S., Wang, R., Price, S., & Bowman, S. (2025). *Petri: An open-source auditing tool to accelerate AI safety research.* https://alignment.anthropic.com/2025/petri/
+3. Blanche, D. (2026). *The Transmutation Gap: Cross-Lingual Coherence Evaluation in Large Language Models.* [venue / preprint status to confirm]
+4. Qwen Team (2024). *Qwen2.5 Technical Report.* arXiv:2412.15115. https://arxiv.org/abs/2412.15115
+5. Newcombe, R. G. (1998). Interval estimation for the difference between independent proportions: comparison of eleven methods. *Statistics in Medicine*, 17(8), 873–890.
+6. Wilson, E. B. (1927). Probable inference, the law of succession, and statistical inference. *Journal of the American Statistical Association*, 22(158), 209–212.
+7. Cohen, J. (1960). A coefficient of agreement for nominal scales. *Educational and Psychological Measurement*, 20(1), 37–46.
+8. *[CITATION NEEDED — Marks et al., cited by Lamerton & Roger (2026) as the source of the static black-box auditing techniques. Full bibliographic details not available in project materials; supply or remove before submission.]*
 
 ---
 
@@ -240,13 +272,16 @@ H.E.M. built the audit pipeline, deployed the model endpoints, and authored the 
 
 **Claims we are explicitly not making.** We do not claim the organism has no secret loyalty. We do not claim the audit successfully detected one. We do not claim Swahili conceals loyalties better than English. We do not claim our Swahili materials are correct. Each of these would require evidence we do not have.
 
+**PSBA-20 and dual use.** PSBA-20 is a detection instrument. It measures whether a model's decisions shift toward a named principal; it provides no method for installing such a preference. Because it requires a candidate principal as input, it is of limited use to an attacker, who would already know the answer it is designed to measure.
+
 **Personal data.** No personal or user data was involved. All prompts were authored by the team; all completions are model-generated.
 
 ## Appendix B — LLM Usage Statement
 
 LLM assistance was used substantially in this project and we describe it precisely, because in the Swahili condition it is not merely a writing aid but part of the measurement pipeline.
 
-- **Swahili localization** of all 30 probes was machine-generated (Claude), then cross-checked by Mistral, ChatGPT and Claude; one model's revisions were incorporated. No fluent human speaker verified it.
+- **PSBA-20's architecture** was developed with Claude's assistance; the design decisions, control structure and validation criteria were reviewed and approved by the authors.
+- **Swahili localization** of all 30 probes was machine-generated (Claude), then cross-checked by Mistral, ChatGPT and Claude; one model's revisions were incorporated. **No fluent human speaker verified it.** An earlier draft of this project planned a French condition localized by a fluent team member; that condition was replaced by Swahili, and no equivalent human verification exists for the Swahili materials.
 - **English translations** of all scored Swahili completions were produced by Claude under instruction to preserve disfluency. Annotators read these translations alongside the originals. Translation provenance is recorded per item in the released data.
 - **Code** (scoring tool, overlap splitter, translation injector, analysis) was written with Claude's assistance and reviewed by the team. The analysis script was verified end-to-end on synthetic annotations before use on real data; the synthetic data was deleted and never entered `results/`.
 - **Report drafting** was assisted by Claude from the computed results. All figures in this report were regenerated from the annotation files.
